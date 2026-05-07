@@ -57,9 +57,18 @@ rm -f "${TARBALL}"
 chown -R "${cfn_cluster_user}:${cfn_cluster_user}" "${MONITORING_HOME}"
 
 # Hand off to the OS-aware installer.
-bash -x "${MONITORING_HOME}/installer/install.sh" >"${LOG_FILE}" 2>&1
-rc=$?
+# tee so output goes to BOTH the log file (persistent on disk) AND stdout
+# (captured by cfn-init -> CloudWatch Logs, so it survives head-node
+# teardown on failure).
+set +e
+bash -x "${MONITORING_HOME}/installer/install.sh" 2>&1 | tee "${LOG_FILE}"
+rc=${PIPESTATUS[0]}
+set -e
 if [[ ${rc} -ne 0 ]]; then
-    echo "monitoring install failed; see ${LOG_FILE}" >&2
+    echo "=============================================================" >&2
+    echo "monitoring install FAILED with exit ${rc}" >&2
+    echo "last 80 lines of ${LOG_FILE}:" >&2
+    echo "=============================================================" >&2
+    tail -n 80 "${LOG_FILE}" >&2 || true
 fi
 exit "${rc}"

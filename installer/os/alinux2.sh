@@ -8,10 +8,9 @@ set -euo pipefail
 log "Installing docker on Amazon Linux 2"
 # Amazon Linux 2 has docker in its extras repo.
 amazon-linux-extras install -y docker
-yum -y install jq bc curl tar
+yum -y install jq bc tar gzip
 
 # Docker Compose v2 is NOT in AL2 repos. Install as a plugin binary.
-# This is the documented upstream path when distro packages aren't available.
 COMPOSE_VERSION="v2.29.7"
 install -d -m 0755 /usr/libexec/docker/cli-plugins
 curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-$(uname -m)" \

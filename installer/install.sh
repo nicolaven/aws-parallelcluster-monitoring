@@ -54,7 +54,8 @@ case "${cfn_node_type}" in
 
         # Extract context from chef dna.json and CloudFormation.
         cfn_fsx_fs_id=$(jq -r '.cfn_fsx_fs_id // ""' /etc/chef/dna.json 2>/dev/null || echo "")
-        master_instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+        master_instance_id=$(imds_get instance-id)
+        [[ -n "${master_instance_id}" ]] || die "Failed to fetch instance-id from IMDSv2"
         s3_bucket=$(echo "${cfn_postinstall:-}" | sed 's|s3://||;s|/.*||')
         cluster_s3_bucket=$(jq -r '.cluster_s3_bucket // ""' /etc/chef/dna.json 2>/dev/null || echo "")
         cluster_config_s3_key=$(jq -r '.cluster_config_s3_key // ""' /etc/chef/dna.json 2>/dev/null || echo "")
@@ -105,7 +106,10 @@ case "${cfn_node_type}" in
         nginx_dir="${MONITORING_HOME}/nginx"
         nginx_ssl_dir="${nginx_dir}/ssl"
         mkdir -p "${nginx_ssl_dir}"
-        public_hostname=$(curl -s http://169.254.169.254/latest/meta-data/public-hostname || echo localhost)
+        # Prefer public hostname; fall back to private hostname for clusters in private subnets.
+        public_hostname=$(imds_get public-hostname)
+        [[ -n "${public_hostname}" ]] || public_hostname=$(imds_get hostname)
+        [[ -n "${public_hostname}" ]] || public_hostname="localhost"
         echo -e "\nDNS.1=${public_hostname}" >> "${nginx_dir}/openssl.cnf"
         openssl req -new -x509 -nodes -newkey rsa:4096 -days 3650 \
             -keyout "${nginx_ssl_dir}/nginx.key" \

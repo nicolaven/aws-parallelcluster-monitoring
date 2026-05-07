@@ -77,6 +77,24 @@ has_nvidia_gpu() {
     return 1
 }
 
+
+# ---------------------------------------------------------------------------
+# IMDSv2-compatible metadata fetch. ParallelCluster sets Imds.Secured=True
+# by default, which requires a session token.
+# ---------------------------------------------------------------------------
+imds_get() {
+    local path="$1"
+    local token
+    token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" \
+        -H "X-aws-ec2-metadata-token-ttl-seconds: 60" 2>/dev/null)
+    if [[ -z "${token}" ]]; then
+        echo ""
+        return 1
+    fi
+    curl -sS -H "X-aws-ec2-metadata-token: ${token}" \
+        "http://169.254.169.254/latest/meta-data/${path}" 2>/dev/null || true
+}
+
 # ---------------------------------------------------------------------------
 # Install rivosinc prometheus-slurm-exporter from a prebuilt release.
 # Replaces the old "go build from vpenso fork" flow.
