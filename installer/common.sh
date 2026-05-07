@@ -79,43 +79,6 @@ has_nvidia_gpu() {
 
 
 # ---------------------------------------------------------------------------
-# IMDSv2-compatible metadata fetch. ParallelCluster sets Imds.Secured=True
-# by default, which requires a session token.
-# ---------------------------------------------------------------------------
-imds_get() {
-    local path="$1"
-    local token body http_code curl_err attempt
-    curl_err=$(mktemp)
-    # Retry the token PUT — IMDS can be briefly unavailable during very
-    # early boot, especially on freshly-launched instances.
-    for attempt in 1 2 3 4 5; do
-        token=$(curl -sS --max-time 5 -X PUT "http://169.254.169.254/latest/api/token" \
-            -H "X-aws-ec2-metadata-token-ttl-seconds: 60" 2>"${curl_err}")
-        if [[ -n "${token}" ]]; then
-            break
-        fi
-        warn "IMDSv2 token PUT attempt ${attempt}/5 returned empty for path=${path} (curl: $(cat "${curl_err}"))"
-        sleep 2
-    done
-    rm -f "${curl_err}"
-    if [[ -z "${token}" ]]; then
-        return 1
-    fi
-    # Use -w to capture the HTTP status and fail cleanly on 404 (e.g. when
-    # asking for public-hostname on a private-subnet instance, IMDS returns
-    # an XML error page with 404 which must NOT be treated as a hostname).
-    body=$(curl -sS -o /dev/stdout -w "\n%{http_code}" \
-        -H "X-aws-ec2-metadata-token: ${token}" \
-        "http://169.254.169.254/latest/meta-data/${path}" 2>/dev/null)
-    http_code="${body##*$'\n'}"
-    body="${body%$'\n'"${http_code}"}"
-    if [[ "${http_code}" != "200" ]]; then
-        return 1
-    fi
-    printf '%s' "${body}"
-}
-
-# ---------------------------------------------------------------------------
 # Install rivosinc prometheus-slurm-exporter from a prebuilt release.
 # Replaces the old "go build from vpenso fork" flow.
 # ---------------------------------------------------------------------------

@@ -54,8 +54,11 @@ case "${cfn_node_type}" in
 
         # Extract context from chef dna.json and CloudFormation.
         cfn_fsx_fs_id=$(jq -r '.cfn_fsx_fs_id // ""' /etc/chef/dna.json 2>/dev/null || echo "")
-        master_instance_id=$(imds_get instance-id) \
-            || die "Failed to fetch instance-id from IMDSv2"
+        # Instance ID: read from cloud-init's on-disk copy. No IMDS needed,
+        # works regardless of ParallelCluster's Imds.Secured setting.
+        master_instance_id=$(cat /var/lib/cloud/data/instance-id 2>/dev/null || true)
+        [[ -n "${master_instance_id}" ]] \
+            || die "Could not read instance-id from /var/lib/cloud/data/instance-id"
         s3_bucket=$(echo "${cfn_postinstall:-}" | sed 's|s3://||;s|/.*||')
         cluster_s3_bucket=$(jq -r '.cluster_s3_bucket // ""' /etc/chef/dna.json 2>/dev/null || echo "")
         cluster_config_s3_key=$(jq -r '.cluster_config_s3_key // ""' /etc/chef/dna.json 2>/dev/null || echo "")
@@ -106,13 +109,12 @@ case "${cfn_node_type}" in
         nginx_dir="${MONITORING_HOME}/nginx"
         nginx_ssl_dir="${nginx_dir}/ssl"
         mkdir -p "${nginx_ssl_dir}"
-        # Prefer public hostname; fall back to private hostname for clusters in
-        # private subnets; finally fall back to localhost.
-        public_hostname=$(imds_get public-hostname 2>/dev/null) \
-            || public_hostname=$(imds_get hostname 2>/dev/null) \
-            || public_hostname="localhost"
-        log "TLS cert SAN: ${public_hostname}"
-        echo -e "\nDNS.1=${public_hostname}" >> "${nginx_dir}/openssl.cnf"
+        # Self-signed cert uses a generic SAN. Users accessing via
+        # SSM port-forward hit https://localhost:*. Users accessing via
+        # public IP will see a cert warning either way (self-signed).
+        # Phase 2 adds an optional ACM + ALB path for trusted certs.
+        echo -e "\nDNS.1=localhost" >> "${nginx_dir}/openssl.cnf"
+        log "TLS cert SAN: localhost (self-signed)"
         openssl req -new -x509 -nodes -newkey rsa:4096 -days 3650 \
             -keyout "${nginx_ssl_dir}/nginx.key" \
             -out "${nginx_ssl_dir}/nginx.crt" \
