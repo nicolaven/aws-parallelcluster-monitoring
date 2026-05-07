@@ -84,15 +84,24 @@ has_nvidia_gpu() {
 # ---------------------------------------------------------------------------
 imds_get() {
     local path="$1"
-    local token
+    local token body http_code
     token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" \
         -H "X-aws-ec2-metadata-token-ttl-seconds: 60" 2>/dev/null)
     if [[ -z "${token}" ]]; then
-        echo ""
         return 1
     fi
-    curl -sS -H "X-aws-ec2-metadata-token: ${token}" \
-        "http://169.254.169.254/latest/meta-data/${path}" 2>/dev/null || true
+    # Use -w to capture the HTTP status and fail cleanly on 404 (e.g. when
+    # asking for public-hostname on a private-subnet instance, IMDS returns
+    # an XML error page with 404 which must NOT be treated as a hostname).
+    body=$(curl -sS -o /dev/stdout -w "\n%{http_code}" \
+        -H "X-aws-ec2-metadata-token: ${token}" \
+        "http://169.254.169.254/latest/meta-data/${path}" 2>/dev/null)
+    http_code="${body##*$'\n'}"
+    body="${body%$'\n'"${http_code}"}"
+    if [[ "${http_code}" != "200" ]]; then
+        return 1
+    fi
+    printf '%s' "${body}"
 }
 
 # ---------------------------------------------------------------------------
