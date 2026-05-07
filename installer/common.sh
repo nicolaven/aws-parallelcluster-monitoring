@@ -84,9 +84,20 @@ has_nvidia_gpu() {
 # ---------------------------------------------------------------------------
 imds_get() {
     local path="$1"
-    local token body http_code
-    token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" \
-        -H "X-aws-ec2-metadata-token-ttl-seconds: 60" 2>/dev/null)
+    local token body http_code curl_err attempt
+    curl_err=$(mktemp)
+    # Retry the token PUT — IMDS can be briefly unavailable during very
+    # early boot, especially on freshly-launched instances.
+    for attempt in 1 2 3 4 5; do
+        token=$(curl -sS --max-time 5 -X PUT "http://169.254.169.254/latest/api/token" \
+            -H "X-aws-ec2-metadata-token-ttl-seconds: 60" 2>"${curl_err}")
+        if [[ -n "${token}" ]]; then
+            break
+        fi
+        warn "IMDSv2 token PUT attempt ${attempt}/5 returned empty for path=${path} (curl: $(cat "${curl_err}"))"
+        sleep 2
+    done
+    rm -f "${curl_err}"
     if [[ -z "${token}" ]]; then
         return 1
     fi
