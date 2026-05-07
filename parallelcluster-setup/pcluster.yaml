@@ -1,8 +1,16 @@
 # Example ParallelCluster 3.x config using aws-parallelcluster-monitoring.
 # Tested on alinux2, alinux2023, ubuntu22.04, ubuntu24.04, rhel9.
 #
-# Pin the monitoring stack by git tag (first arg to post-install.sh).
-# Bump the tag here when you upgrade.
+# post-install.sh accepts up to two args:
+#   Args:
+#     - <ref>         # tag (e.g. v1.0) or branch (e.g. main). Default: v1.0
+#     - <repo_slug>   # owner/repo. Default: aws-samples/aws-parallelcluster-monitoring
+#
+# Testing from a fork:
+#   Script: https://raw.githubusercontent.com/<you>/aws-parallelcluster-monitoring/<branch>/post-install.sh
+#   Args:
+#     - <tag-or-branch>
+#     - <you>/aws-parallelcluster-monitoring
 HeadNode:
   InstanceType: c5.xlarge
   Networking:

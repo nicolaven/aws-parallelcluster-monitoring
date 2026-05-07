@@ -44,6 +44,24 @@ Bump deliberately.
 
 Full example: [parallelcluster-setup/pcluster.yaml](parallelcluster-setup/pcluster.yaml).
 
+### Testing from a fork
+
+`post-install.sh` accepts an optional second arg for the repo slug, so you
+can test changes from your fork without editing the script:
+
+```yaml
+CustomActions:
+  OnNodeConfigured:
+    Script: https://raw.githubusercontent.com/<you>/aws-parallelcluster-monitoring/<branch>/post-install.sh
+    Args:
+      - <tag-or-branch>
+      - <you>/aws-parallelcluster-monitoring
+```
+
+The first arg can be a tag (e.g. `v1.0-rc1`) or a branch (e.g. `main`).
+The script tries the tag URL first, then falls back to the branch URL, so
+either works.
+
 Open a security group allowing inbound 80/443 to the HeadNode, attach it as
 `AdditionalSecurityGroups`, then browse to `https://<head-node-public-ip>/`.
 Grafana login: `admin` / `Grafana4PC!` (change on first login; a per-cluster
