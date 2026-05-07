@@ -1,3 +1,8 @@
+# Example ParallelCluster 3.x config using aws-parallelcluster-monitoring.
+# Tested on alinux2, alinux2023, ubuntu22.04, ubuntu24.04, rhel9.
+#
+# Pin the monitoring stack by git tag (first arg to post-install.sh).
+# Bump the tag here when you upgrade.
 HeadNode:
   InstanceType: c5.xlarge
   Networking:
@@ -13,9 +18,7 @@ HeadNode:
     OnNodeConfigured:
       Script: https://raw.githubusercontent.com/aws-samples/aws-parallelcluster-monitoring/main/post-install.sh
       Args:
-        - https://github.com/aws-samples/aws-parallelcluster-monitoring/tarball/main
-        - aws-parallelcluster-monitoring
-        - install-monitoring.sh
+        - v1.0
   Iam:
     AdditionalIamPolicies:
       - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
@@ -45,9 +48,7 @@ Scheduling:
         OnNodeConfigured:
           Script: https://raw.githubusercontent.com/aws-samples/aws-parallelcluster-monitoring/main/post-install.sh
           Args:
-            - https://github.com/aws-samples/aws-parallelcluster-monitoring/tarball/main
-            - aws-parallelcluster-monitoring
-            - install-monitoring.sh
+            - v1.0
       Iam:
         AdditionalIamPolicies:
           - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
@@ -57,7 +58,8 @@ Scheduling:
           - Policy: arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
 Region: us-east-2
 Image:
-  Os: alinux2
+  # alinux2023 is the PC 3.8+ default. alinux2, ubuntu22/24, rhel9 also work.
+  Os: alinux2023
 Tags:
   - Key: 'Grafana'
     Value: 'true'

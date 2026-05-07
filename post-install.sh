@@ -1,34 +1,38 @@
 #!/bin/bash
-#
+# shellcheck disable=SC2154  # cfn_* / stack_name vars come from /etc/parallelcluster/cfnconfig
 #
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 #
-# Usage: ./post-install [version]
+# ParallelCluster OnNodeConfigured post-install entrypoint.
+#
+# Usage: post-install.sh [version_tag]
+#   version_tag: git tag of aws-parallelcluster-monitoring to install.
+#                Defaults to the most recent stable release.
+#
+set -euo pipefail
 
-#Load AWS Parallelcluster environment variables
+# shellcheck disable=SC1091
 . /etc/parallelcluster/cfnconfig
 
-version=${1:-v0.9}
-monitoring_dir_name=aws-parallelcluster-monitoring
-monitoring_tarball="${monitoring_dir_name}.tar.gz"
+VERSION="${1:-v1.0}"
+MONITORING_DIR_NAME="aws-parallelcluster-monitoring"
+TARBALL_URL="https://github.com/aws-samples/${MONITORING_DIR_NAME}/archive/refs/tags/${VERSION}.tar.gz"
+MONITORING_HOME="/home/${cfn_cluster_user}/${MONITORING_DIR_NAME}"
+LOG_FILE="/var/log/parallelcluster-monitoring-install.log"
 
-#get GitHub repo to clone and the installation script
-monitoring_url=https://github.com/aws-samples/aws-parallelcluster-monitoring/archive/refs/tags/${version}.tar.gz
-setup_command=install-monitoring.sh
-monitoring_home="/home/${cfn_cluster_user}/${monitoring_dir_name}"
+# Fetch once; every node type needs the installer tree.
+mkdir -p "${MONITORING_HOME}"
+curl -fsSL "${TARBALL_URL}" -o "/tmp/${MONITORING_DIR_NAME}.tar.gz"
+tar xzf "/tmp/${MONITORING_DIR_NAME}.tar.gz" -C "${MONITORING_HOME}" --strip-components 1
+rm -f "/tmp/${MONITORING_DIR_NAME}.tar.gz"
 
-case ${cfn_node_type} in
-    HeadNode | MasterServer)
-        wget ${monitoring_url} -O ${monitoring_tarball}
-        mkdir -p ${monitoring_home}
-        tar xvf ${monitoring_tarball} -C ${monitoring_home} --strip-components 1
-    ;;
-    ComputeFleet)
-    
-    ;;
-esac
+chown -R "${cfn_cluster_user}:${cfn_cluster_user}" "${MONITORING_HOME}"
 
-#Execute the monitoring installation script
-bash -x "${monitoring_home}/parallelcluster-setup/${setup_command}" >/tmp/monitoring-setup.log 2>&1
-exit $?
+# Hand off to the OS-aware installer.
+bash -x "${MONITORING_HOME}/installer/install.sh" >"${LOG_FILE}" 2>&1
+rc=$?
+if [[ ${rc} -ne 0 ]]; then
+    echo "monitoring install failed; see ${LOG_FILE}" >&2
+fi
+exit "${rc}"
