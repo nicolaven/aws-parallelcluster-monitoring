@@ -45,6 +45,10 @@ services:
       # Rotate the SSM parameter and the timer will pick up the new value.
       - 'GF_SECURITY_ADMIN_PASSWORD__FILE=/run/grafana-secrets/admin-password'
       - 'GF_SERVER_ROOT_URL=http://%(domain)s/grafana/'
+    env_file:
+      # Cognito OAuth2 config, materialized by installer from SSM.
+      # Empty file when Cognito is not configured (no-op).
+      - '/run/grafana-secrets/cognito.env'
     volumes:
       - '/home/${cfn_cluster_user}/__MONITORING_DIR__/grafana:/etc/grafana/provisioning'
       - 'grafana-data:/var/lib/grafana'

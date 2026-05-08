@@ -153,6 +153,76 @@ case "${cfn_node_type}" in
         log "Grafana password refresh timer active"
 
         # -------------------------------------------------------------
+                # -------------------------------------------------------------
+        # Optional: Cognito SSO for Grafana (Phase 2b.2).
+        # Users populate /parallelcluster/<cluster>/grafana/cognito with a
+        # JSON blob (SecureString):
+        #   {
+        #     "user_pool_id":   "us-east-2_ABC123",
+        #     "client_id":      "xxxxxxxxxxxxxxxx",
+        #     "client_secret":  "yyyyyyyyyyyyyyyy",
+        #     "domain":         "my-pool-auth",
+        #     "region":         "us-east-2",
+        #     "allowed_domains": "amazon.com"
+        #   }
+        # When present, Grafana is configured to use Cognito OAuth2.
+        # When absent, local admin/password login is the only auth path.
+        # -------------------------------------------------------------
+        COGNITO_SSM_PARAM="/parallelcluster/${stack_name}/grafana/cognito"
+        cognito_json=$(aws ssm get-parameter --region "${cfn_region}" \
+            --name "${COGNITO_SSM_PARAM}" --with-decryption \
+            --query 'Parameter.Value' --output text 2>/dev/null) || cognito_json=""
+
+        if [[ -n "${cognito_json}" ]]; then
+            log "Cognito SSO config found in ${COGNITO_SSM_PARAM}; enabling OAuth2"
+            # Extract fields via jq and write to a Grafana env-file that
+            # docker-compose loads. Put it under /run so nothing persistent
+            # on disk.
+            mkdir -p /run/grafana-secrets
+            chmod 0750 /run/grafana-secrets
+            chown root:65534 /run/grafana-secrets
+
+            cog_client=$(echo "${cognito_json}"  | jq -r .client_id)
+            cog_secret=$(echo "${cognito_json}"  | jq -r .client_secret)
+            cog_domain=$(echo "${cognito_json}"  | jq -r .domain)
+            cog_region=$(echo "${cognito_json}"  | jq -r '.region // "'"${cfn_region}"'"')
+            cog_allowed=$(echo "${cognito_json}" | jq -r '.allowed_domains // ""')
+
+            cat > /run/grafana-secrets/cognito.env <<COGENV
+# Grafana OAuth2 config — loaded by compose at container start
+GF_AUTH_GENERIC_OAUTH_ENABLED=true
+GF_AUTH_GENERIC_OAUTH_NAME=Cognito
+GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
+GF_AUTH_GENERIC_OAUTH_CLIENT_ID=${cog_client}
+GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET__FILE=/run/grafana-secrets/cognito-client-secret
+GF_AUTH_GENERIC_OAUTH_SCOPES=openid email profile
+GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://${cog_domain}.auth.${cog_region}.amazoncognito.com/oauth2/authorize
+GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://${cog_domain}.auth.${cog_region}.amazoncognito.com/oauth2/token
+GF_AUTH_GENERIC_OAUTH_API_URL=https://${cog_domain}.auth.${cog_region}.amazoncognito.com/oauth2/userInfo
+GF_AUTH_GENERIC_OAUTH_ALLOWED_DOMAINS=${cog_allowed}
+GF_AUTH_SIGNOUT_REDIRECT_URL=https://${cog_domain}.auth.${cog_region}.amazoncognito.com/logout?client_id=${cog_client}
+COGENV
+            # Write the client secret to its own file so it doesn't appear in
+            # docker inspect / `env` output. Grafana's __FILE env var variant
+            # reads it at startup.
+            umask 0077
+            printf '%s' "${cog_secret}" > /run/grafana-secrets/cognito-client-secret
+            chmod 0640 /run/grafana-secrets/cognito-client-secret
+            chown root:65534 /run/grafana-secrets/cognito-client-secret
+            umask 0022
+            chmod 0640 /run/grafana-secrets/cognito.env
+            chown root:65534 /run/grafana-secrets/cognito.env
+            log "Cognito env file written to /run/grafana-secrets/cognito.env"
+            unset cog_secret cog_client
+        else
+            log "No Cognito config in ${COGNITO_SSM_PARAM}; using local admin login only"
+            # Create an empty file so docker-compose doesn't complain about
+            # a missing env_file.
+            mkdir -p /run/grafana-secrets
+            : > /run/grafana-secrets/cognito.env
+            chmod 0640 /run/grafana-secrets/cognito.env
+        fi
+
                 # Set up credential refresh for Prometheus ec2_sd_configs.
         # ParallelCluster's Imds.Secured=true blocks IMDS from non-root
         # processes (including containers). This timer runs as root on the
