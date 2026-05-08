@@ -2210,6 +2210,114 @@
         "defaults": {},
         "overrides": []
       }
+    },
+    {
+      "type": "row",
+      "title": "EFA / InfiniBand (populates if EFA hardware present)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 999
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "EFA Bandwidth (RX)",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1000
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "8 * rate(node_infiniband_port_data_received_bytes_total{instance_id=\"$node_instance_id\"}[1m])",
+          "legendFormat": "{{device}} port {{port}} RX",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "EFA Bandwidth (TX)",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1000
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "8 * rate(node_infiniband_port_data_transmitted_bytes_total{instance_id=\"$node_instance_id\"}[1m])",
+          "legendFormat": "{{device}} port {{port}} TX",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "EFA Packet Rate (RX)",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1008
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "rate(node_infiniband_port_packets_received_total{instance_id=\"$node_instance_id\"}[1m])",
+          "legendFormat": "{{device}} port {{port}} RX",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "EFA Packet Rate (TX)",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1008
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "rate(node_infiniband_port_packets_transmitted_total{instance_id=\"$node_instance_id\"}[1m])",
+          "legendFormat": "{{device}} port {{port}} TX",
+          "refId": "A"
+        }
+      ]
     }
   ],
   "refresh": "5s",
@@ -2219,140 +2327,27 @@
   "templating": {
     "list": [
       {
-        "allValue": null,
-        "current": {
-          "text": "i-08ab98802857b0864",
-          "value": "i-08ab98802857b0864"
-        },
-        "datasource": "prometheus",
-        "definition": "label_values(node_uname_info{job=~\"ec2_instances\"}, instance_id)",
-        "hide": 0,
-        "includeAll": false,
-        "label": "Instance ID",
-        "multi": false,
-        "name": "instance_id",
-        "options": [],
-        "query": "label_values(node_uname_info{job=~\"ec2_instances\"}, instance_id)",
-        "refresh": 1,
-        "regex": "^(?!.*__INSTANCE_ID__).*$",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allFormat": "glob",
-        "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
-        "datasource": "prometheus",
-        "definition": "label_values(node_uname_info{instance_id=~\"$instance_id\"},instance)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "IP",
-        "multi": false,
-        "multiFormat": "regex values",
         "name": "node",
-        "options": [],
-        "query": "label_values(node_uname_info{instance_id=~\"$instance_id\"},instance)",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
         "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {
-          "text": "/",
-          "value": "/"
-        },
         "datasource": "prometheus",
-        "definition": "",
-        "hide": 2,
-        "includeAll": false,
-        "label": "",
+        "query": "label_values(node_uname_info{instance_name=\"Compute\"}, nodename)",
+        "refresh": 1,
         "multi": false,
-        "name": "maxmount",
-        "options": [],
-        "query": "query_result(topk(1,sort_desc (max(node_filesystem_size_bytes{instance=~'$node',fstype=~\"ext4|xfs\"}) by (mountpoint))))",
-        "refresh": 2,
-        "regex": "/.*\\\"(.*)\\\".*/",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
+        "includeAll": false,
+        "sort": 1,
+        "hide": 0,
+        "label": "Node"
       },
       {
-        "allFormat": "glob",
-        "allValue": null,
-        "current": {
-          "isNone": true,
-          "selected": false,
-          "text": "None",
-          "value": ""
-        },
+        "name": "node_instance_id",
+        "type": "query",
         "datasource": "prometheus",
-        "definition": "",
-        "hide": 2,
-        "includeAll": false,
-        "label": "\u73af\u5883",
+        "query": "label_values(node_uname_info{nodename=\"$node\"}, instance_id)",
+        "refresh": 2,
         "multi": false,
-        "multiFormat": "regex values",
-        "name": "env",
-        "options": [],
-        "query": "label_values(node_exporter_build_info,env)",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allFormat": "glob",
-        "allValue": "",
-        "current": {
-          "text": "None",
-          "value": [
-            ""
-          ]
-        },
-        "datasource": "prometheus",
-        "definition": "label_values(node_exporter_build_info{env=~'$env'},name)",
-        "hide": 2,
         "includeAll": false,
-        "label": "\u540d\u79f0",
-        "multi": true,
-        "multiFormat": "regex values",
-        "name": "name",
-        "options": [],
-        "query": "label_values(node_exporter_build_info{env=~'$env'},name)",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "/.*/",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
+        "hide": 2,
+        "sort": 0
       }
     ]
   },

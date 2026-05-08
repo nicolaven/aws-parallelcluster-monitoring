@@ -30,7 +30,14 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "links": [
+            {
+              "title": "View compute node details",
+              "url": "/d/compute-node-details?var-node=${__data.fields.nodename}",
+              "targetBlank": false
+            }
+          ]
         },
         "overrides": []
       },
