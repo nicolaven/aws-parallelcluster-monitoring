@@ -40,12 +40,15 @@ services:
     pid: host
     restart: unless-stopped
     environment:
-      # NOTE: Phase 2 will replace this with a per-cluster secret in SSM.
-      - 'GF_SECURITY_ADMIN_PASSWORD=Grafana4PC!'
+      # Password is read from a file that a host-side systemd timer
+      # (refresh-grafana-password.sh) populates from SSM Parameter Store.
+      # Rotate the SSM parameter and the timer will pick up the new value.
+      - 'GF_SECURITY_ADMIN_PASSWORD__FILE=/run/grafana-secrets/admin-password'
       - 'GF_SERVER_ROOT_URL=http://%(domain)s/grafana/'
     volumes:
       - '/home/${cfn_cluster_user}/__MONITORING_DIR__/grafana:/etc/grafana/provisioning'
       - 'grafana-data:/var/lib/grafana'
+      - '/run/grafana-secrets:/run/grafana-secrets:ro'
     image: grafana/grafana:11.2.2
 
   prometheus-node-exporter:

@@ -121,7 +121,39 @@ case "${cfn_node_type}" in
             -config "${nginx_dir}/openssl.cnf" >/dev/null 2>&1
         chown -R "${cfn_cluster_user}:${cfn_cluster_user}" "${nginx_ssl_dir}"
 
-        # Set up credential refresh for Prometheus ec2_sd_configs.
+        # -------------------------------------------------------------
+        # Grafana admin password: generate random, write to SSM SecureString,
+        # set up a systemd timer to materialize it into a mounted file.
+        # Idempotent: if the SSM parameter already exists we reuse it (so
+        # subsequent runs / updates don't break existing logins).
+        # -------------------------------------------------------------
+        GRAFANA_SSM_PARAM="/parallelcluster/${stack_name}/grafana/admin-password"
+        if aws ssm get-parameter --region "${cfn_region}" --name "${GRAFANA_SSM_PARAM}" --with-decryption >/dev/null 2>&1; then
+            log "Reusing existing Grafana password in ${GRAFANA_SSM_PARAM}"
+        else
+            log "Generating new Grafana admin password, storing in ${GRAFANA_SSM_PARAM}"
+            GRAFANA_PASSWORD=$(tr -dc '''A-Za-z0-9!@#$%^&*''' < /dev/urandom | head -c 32)
+            aws ssm put-parameter --region "${cfn_region}" \
+                --name "${GRAFANA_SSM_PARAM}" \
+                --type SecureString \
+                --value "${GRAFANA_PASSWORD}" \
+                --tags "Key=parallelcluster:cluster-name,Value=${stack_name}" \
+                --no-overwrite >/dev/null
+            unset GRAFANA_PASSWORD
+        fi
+
+        # Install the Grafana password refresh timer.
+        install -m 0755 "${MONITORING_HOME}/custom-metrics/refresh-grafana-password.sh" /usr/local/bin/
+        install -m 0644 "${MONITORING_HOME}/systemd/grafana-password-refresh.service" /etc/systemd/system/
+        install -m 0644 "${MONITORING_HOME}/systemd/grafana-password-refresh.timer" /etc/systemd/system/
+        systemctl daemon-reload
+        # Run once immediately so the file exists before Grafana starts.
+        /usr/local/bin/refresh-grafana-password.sh
+        systemctl enable --now grafana-password-refresh.timer
+        log "Grafana password refresh timer active"
+
+        # -------------------------------------------------------------
+                # Set up credential refresh for Prometheus ec2_sd_configs.
         # ParallelCluster's Imds.Secured=true blocks IMDS from non-root
         # processes (including containers). This timer runs as root on the
         # host, fetches role creds from IMDS, and writes them to a file
@@ -183,4 +215,17 @@ case "${cfn_node_type}" in
         ;;
 esac
 
+# Final summary: surface the Grafana password location so users know
+# how to retrieve it. This is printed AFTER everything is up so it's
+# the last thing in the log.
+if [[ "${cfn_node_type}" == "HeadNode" || "${cfn_node_type}" == "MasterServer" ]]; then
+    log "==========================================================="
+    log "Grafana admin password is in SSM Parameter Store:"
+    log "  ${GRAFANA_SSM_PARAM:-/parallelcluster/${stack_name}/grafana/admin-password}"
+    log "Retrieve with:"
+    log "  aws ssm get-parameter --region ${cfn_region} \\"
+    log "    --name /parallelcluster/${stack_name}/grafana/admin-password \\"
+    log "    --with-decryption --query Parameter.Value --output text"
+    log "==========================================================="
+fi
 log "Done."
