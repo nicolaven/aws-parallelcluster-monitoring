@@ -45,6 +45,8 @@ services:
       # Rotate the SSM parameter and the timer will pick up the new value.
       - 'GF_SECURITY_ADMIN_PASSWORD__FILE=/run/grafana-secrets/admin-password'
       - 'GF_SERVER_ROOT_URL=http://%(domain)s/grafana/'
+      # Land every user on ParallelCluster Summary after login.
+      - 'GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/ParallelCluster.json'
     env_file:
       # Cognito OAuth2 config, materialized by installer from SSM.
       # Empty file when Cognito is not configured (no-op).
