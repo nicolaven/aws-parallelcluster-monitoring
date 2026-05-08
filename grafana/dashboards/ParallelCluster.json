@@ -687,14 +687,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "slurm_cpus_per_state{state=\"completing\"}",
+          "expr": "slurm_cpus_per_state{state=\"comp\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Completing Jobs",
           "refId": "A"
         },
         {
-          "expr": "slurm_cpus_per_state{state=\"allocated\"}",
+          "expr": "slurm_cpus_per_state{state=\"alloc\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Running Jobs",
@@ -757,7 +757,7 @@
           "refId": "J"
         },
         {
-          "expr": "slurm_cpus_per_state{state=\"completing\"} + slurm_cpus_per_state{state=\"allocated\"} + slurm_cpus_per_state{state=\"idle~\"} + 0 + 0 + 0 + 0 + 0 + 0 + 0",
+          "expr": "slurm_cpus_per_state{state=\"comp\"} + slurm_cpus_per_state{state=\"alloc\"} + slurm_cpus_per_state{state=\"idle~\"} + 0 + 0 + 0 + 0 + 0 + 0 + 0",
           "hide": true,
           "interval": "",
           "intervalFactor": 2,
@@ -862,14 +862,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "slurm_node_count_per_state{state=\"allocated\"}",
+          "expr": "slurm_node_count_per_state{state=\"alloc\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Allocated Nodes",
           "refId": "A"
         },
         {
-          "expr": "slurm_node_count_per_state{state=\"completing\"}",
+          "expr": "slurm_node_count_per_state{state=\"comp\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Completing Nodes",
@@ -890,7 +890,7 @@
           "refId": "E"
         },
         {
-          "expr": "slurm_node_count_per_state{state=\"drained\"}",
+          "expr": "slurm_node_count_per_state{state=\"drain\"}",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "Draining Nodes",
@@ -909,7 +909,7 @@
           "refId": "H"
         },
         {
-          "expr": "slurm_node_count_per_state{state=\"allocated\"} + slurm_node_count_per_state{state=\"down\"} + slurm_node_count_per_state{state=\"drained\"} + slurm_node_count_per_state{state=\"idle\"} + slurm_node_count_per_state{state=\"mixed\"} + slurm_node_count_per_state{state=\"completing\"} + slurm_node_count_per_state{state=\"maintenance\"}",
+          "expr": "slurm_node_count_per_state{state=\"alloc\"} + slurm_node_count_per_state{state=\"down\"} + slurm_node_count_per_state{state=\"drain\"} + slurm_node_count_per_state{state=\"idle\"} + slurm_node_count_per_state{state=\"mixed\"} + slurm_node_count_per_state{state=\"comp\"} + slurm_node_count_per_state{state=\"maintenance\"}",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 2,
@@ -1008,7 +1008,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "slurm_cpus_per_state{state=\"allocated\"}",
+          "expr": "slurm_cpus_per_state{state=\"alloc\"}",
           "instant": false,
           "interval": "1",
           "intervalFactor": 1,
