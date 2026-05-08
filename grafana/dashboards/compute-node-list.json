@@ -186,10 +186,11 @@
       "timeShift": null,
       "title": "All Available Nodes",
       "transform": "table",
-      "type": "table-old"
+      "type": "table",
+      "options": {}
     }
   ],
-  "schemaVersion": 25,
+  "schemaVersion": 39,
   "style": "dark",
   "tags": [],
   "templating": {

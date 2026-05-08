@@ -72,7 +72,16 @@
       "maxDataPoints": 100,
       "nullPointMode": "null",
       "nullText": null,
-      "options": {},
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "area"
+      },
       "pluginVersion": "6.4.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -105,7 +114,7 @@
       ],
       "thresholds": "1,2",
       "title": "System Uptime",
-      "type": "singlestat",
+      "type": "stat",
       "valueFontSize": "100%",
       "valueMaps": [
         {
@@ -114,7 +123,11 @@
           "value": "null"
         }
       ],
-      "valueName": "current"
+      "valueName": "current",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
     },
     {
       "cacheTimeout": null,
@@ -160,7 +173,16 @@
       "maxPerRow": 6,
       "nullPointMode": "null",
       "nullText": null,
-      "options": {},
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "area"
+      },
       "postfix": "",
       "postfixFontSize": "70%",
       "prefix": "",
@@ -192,7 +214,7 @@
       ],
       "thresholds": "2,3",
       "title": "Total RAM",
-      "type": "singlestat",
+      "type": "stat",
       "valueFontSize": "80%",
       "valueMaps": [
         {
@@ -201,7 +223,11 @@
           "value": "null"
         }
       ],
-      "valueName": "current"
+      "valueName": "current",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
     },
     {
       "datasource": "prometheus",
@@ -293,9 +319,9 @@
     },
     {
       "aliasColors": {
-        "15分钟": "#6ED0E0",
-        "1分钟": "#BF1B00",
-        "5分钟": "#CCA300"
+        "15\u5206\u949f": "#6ED0E0",
+        "1\u5206\u949f": "#BF1B00",
+        "5\u5206\u949f": "#CCA300"
       },
       "bars": false,
       "dashLength": 10,
@@ -332,7 +358,16 @@
       "maxPerRow": 6,
       "nullPointMode": "null as zero",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -388,7 +423,7 @@
         "sort": 2,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -415,6 +450,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -649,7 +688,16 @@
       "maxPerRow": 6,
       "nullPointMode": "null",
       "nullText": null,
-      "options": {},
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "area"
+      },
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -681,7 +729,7 @@
       ],
       "thresholds": "1,2",
       "title": "CPU Cores",
-      "type": "singlestat",
+      "type": "stat",
       "valueFontSize": "100%",
       "valueMaps": [
         {
@@ -690,7 +738,11 @@
           "value": "null"
         }
       ],
-      "valueName": "current"
+      "valueName": "current",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
     },
     {
       "cacheTimeout": null,
@@ -735,7 +787,16 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "graphMode": "area"
+      },
       "pluginVersion": "6.4.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -774,7 +835,7 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "CPU IOwait",
-      "type": "singlestat",
+      "type": "stat",
       "valueFontSize": "100%",
       "valueMaps": [
         {
@@ -783,7 +844,11 @@
           "value": "null"
         }
       ],
-      "valueName": "avg"
+      "valueName": "avg",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
     },
     {
       "aliasColors": {
@@ -794,12 +859,12 @@
         "iowait": "#EAB839",
         "irq": "#BF1B00",
         "nice": "#C15C17",
-        "sdb_每秒I/O操作%": "#d683ce",
+        "sdb_\u6bcf\u79d2I/O\u64cd\u4f5c%": "#d683ce",
         "softirq": "#E24D42",
         "steal": "#FCE2DE",
         "system": "#508642",
         "user": "#5195CE",
-        "磁盘花费在I/O操作占比": "#ba43a9"
+        "\u78c1\u76d8\u82b1\u8d39\u5728I/O\u64cd\u4f5c\u5360\u6bd4": "#ba43a9"
       },
       "bars": false,
       "dashLength": 10,
@@ -839,7 +904,16 @@
       "maxPerRow": 6,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -907,7 +981,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -937,12 +1011,16 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
       "aliasColors": {
-        "192.168.10.227:9100_em1_in下载": "super-light-green",
-        "192.168.10.227:9100_em1_out上传": "dark-blue"
+        "192.168.10.227:9100_em1_in\u4e0b\u8f7d": "super-light-green",
+        "192.168.10.227:9100_em1_out\u4e0a\u4f20": "dark-blue"
       },
       "bars": false,
       "dashLength": 10,
@@ -979,7 +1057,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 2,
@@ -1022,7 +1109,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1033,7 +1120,7 @@
       "yaxes": [
         {
           "format": "bps",
-          "label": "transmit（-）/receive（+）",
+          "label": "transmit\uff08-\uff09/receive\uff08+\uff09",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -1051,18 +1138,22 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
       "aliasColors": {
-        "192.168.200.241:9100_总内存": "dark-red",
-        "内存_Avaliable": "#6ED0E0",
-        "内存_Cached": "#EF843C",
-        "内存_Free": "#629E51",
-        "内存_Total": "#6d1f62",
-        "内存_Used": "#eab839",
-        "可用": "#9ac48a",
-        "总内存": "#bf1b00"
+        "192.168.200.241:9100_\u603b\u5185\u5b58": "dark-red",
+        "\u5185\u5b58_Avaliable": "#6ED0E0",
+        "\u5185\u5b58_Cached": "#EF843C",
+        "\u5185\u5b58_Free": "#629E51",
+        "\u5185\u5b58_Total": "#6d1f62",
+        "\u5185\u5b58_Used": "#eab839",
+        "\u53ef\u7528": "#9ac48a",
+        "\u603b\u5185\u5b58": "#bf1b00"
       },
       "bars": false,
       "dashLength": 10,
@@ -1098,7 +1189,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1155,7 +1255,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1184,6 +1284,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1226,7 +1330,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1271,7 +1384,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1301,6 +1414,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1338,7 +1455,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1359,13 +1485,13 @@
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,
-          "legendFormat": "{{instance}}：{{mountpoint}}",
+          "legendFormat": "{{instance}}\uff1a{{mountpoint}}",
           "refId": "A"
         },
         {
           "expr": "node_filesystem_files_free{instance=~'$node',fstype=~\"ext4|xfs\"} / node_filesystem_files{instance=~'$node',fstype=~\"ext4|xfs\"}",
           "hide": true,
-          "legendFormat": "Inodes：{{instance}}：{{mountpoint}}",
+          "legendFormat": "Inodes\uff1a{{instance}}\uff1a{{mountpoint}}",
           "refId": "B"
         }
       ],
@@ -1379,7 +1505,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1410,6 +1536,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1450,7 +1580,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pluginVersion": "6.4.2",
@@ -1505,7 +1644,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1534,6 +1673,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1544,19 +1687,19 @@
         "iowait": "#EAB839",
         "irq": "#BF1B00",
         "nice": "#C15C17",
-        "sdb_每秒I/O操作%": "#d683ce",
+        "sdb_\u6bcf\u79d2I/O\u64cd\u4f5c%": "#d683ce",
         "softirq": "#E24D42",
         "steal": "#FCE2DE",
         "system": "#508642",
         "user": "#5195CE",
-        "磁盘花费在I/O操作占比": "#ba43a9"
+        "\u78c1\u76d8\u82b1\u8d39\u5728I/O\u64cd\u4f5c\u5360\u6bd4": "#ba43a9"
       },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "prometheus",
       "decimals": null,
-      "description": "The time spent on I/O in the natural time of each second.（wall-clock time）",
+      "description": "The time spent on I/O in the natural time of each second.\uff08wall-clock time\uff09",
       "fill": 1,
       "fillGradient": 5,
       "gridPos": {
@@ -1589,7 +1732,16 @@
       "maxPerRow": 6,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1618,7 +1770,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1648,6 +1800,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1691,7 +1847,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1752,7 +1917,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1781,6 +1946,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1822,7 +1991,16 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1868,7 +2046,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -1898,6 +2076,10 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -1939,7 +2121,16 @@
       "links": [],
       "nullPointMode": "null as zero",
       "options": {
-        "dataLinks": []
+        "dataLinks": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "percentage": false,
       "pointradius": 5,
@@ -1985,7 +2176,7 @@
         "sort": 2,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "buckets": null,
         "mode": "time",
@@ -2014,11 +2205,15 @@
       "yaxis": {
         "align": false,
         "alignLevel": null
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       }
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 22,
+  "schemaVersion": 39,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -2114,7 +2309,7 @@
         "definition": "",
         "hide": 2,
         "includeAll": false,
-        "label": "环境",
+        "label": "\u73af\u5883",
         "multi": false,
         "multiFormat": "regex values",
         "name": "env",
@@ -2143,7 +2338,7 @@
         "definition": "label_values(node_exporter_build_info{env=~'$env'},name)",
         "hide": 2,
         "includeAll": false,
-        "label": "名称",
+        "label": "\u540d\u79f0",
         "multi": true,
         "multiFormat": "regex values",
         "name": "name",

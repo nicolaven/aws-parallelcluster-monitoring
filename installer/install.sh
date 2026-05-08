@@ -100,7 +100,7 @@ case "${cfn_node_type}" in
         sed -i "s/__LOG_GROUP__NAMES__/${log_group_names}/g" "${MONITORING_HOME}/grafana/dashboards/logs.json"
         sed -i "s/__Application__/${stack_name}/g"       "${MONITORING_HOME}/prometheus/prometheus.yml"
         sed -i "s/__AWS_REGION__/${cfn_region}/g"        "${MONITORING_HOME}/prometheus/prometheus.yml"
-        sed -i "s/__INSTANCE_ID__/${master_instance_id}/g" "${MONITORING_HOME}/grafana/dashboards/master-node-details.json"
+        sed -i "s/__INSTANCE_ID__/${master_instance_id}/g" "${MONITORING_HOME}/grafana/dashboards/head-node-details.json"
         sed -i "s/__INSTANCE_ID__/${master_instance_id}/g" "${MONITORING_HOME}/grafana/dashboards/compute-node-list.json"
         sed -i "s/__INSTANCE_ID__/${master_instance_id}/g" "${MONITORING_HOME}/grafana/dashboards/compute-node-details.json"
         sed -i "s|__MONITORING_DIR__|${MONITORING_DIR_NAME}|g" "${MONITORING_HOME}/compose/head.yml"
