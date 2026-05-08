@@ -4,12 +4,19 @@
 # SPDX-License-Identifier: MIT-0
 #
 # Fetches the per-cluster Grafana admin password from SSM Parameter Store
-# and writes it to a file that the Grafana container mounts via
-# GF_SECURITY_ADMIN_PASSWORD__FILE.
+# and applies it to the Grafana container.
 #
-# This lets us rotate the password in SSM without touching the container:
-# the next refresh tick picks up the new value, and Grafana re-reads the
-# file on next startup (or we can restart grafana to force immediate pickup).
+# Why: GF_SECURITY_ADMIN_PASSWORD__FILE only sets the default on FIRST boot.
+# After Grafana's DB is initialized, the env var is ignored — we need to
+# call 'grafana cli admin reset-admin-password' to change the admin user's
+# password in the DB.
+#
+# Behavior:
+#   1. Fetch current value from SSM (SecureString, KMS-decrypted).
+#   2. Write to /run/grafana-secrets/admin-password (mounted into container).
+#   3. If the value changed since last run, invoke grafana-cli inside the
+#      container to update the DB record.
+#   4. Skip the DB update if the container isn't running (e.g. during boot).
 #
 set -euo pipefail
 
@@ -21,6 +28,7 @@ set -euo pipefail
 
 SECRET_DIR="/run/grafana-secrets"
 SECRET_FILE="${SECRET_DIR}/admin-password"
+LAST_APPLIED="${SECRET_DIR}/.last-applied"
 SSM_PARAM="/parallelcluster/${stack_name}/grafana/admin-password"
 
 mkdir -p "${SECRET_DIR}"
@@ -36,13 +44,48 @@ password=$(aws ssm get-parameter \
     exit 1
 }
 
-# Only update the file if the value actually changed, to avoid spurious
-# inotify events / log noise.
-if [[ ! -f "${SECRET_FILE}" ]] || [[ "$(cat "${SECRET_FILE}")" != "${password}" ]]; then
+# Update the mounted file only if changed (avoids unnecessary disk writes).
+need_update=1
+if [[ -f "${SECRET_FILE}" ]] && [[ "$(cat "${SECRET_FILE}")" == "${password}" ]]; then
+    need_update=0
+fi
+
+if [[ "${need_update}" -eq 1 ]]; then
     umask 0077
     printf '%s' "${password}" > "${SECRET_FILE}.tmp"
     mv -f "${SECRET_FILE}.tmp" "${SECRET_FILE}"
-    # Grafana container reads its own UID (472). Ensure readable.
     chmod 0644 "${SECRET_FILE}"
-    echo "Grafana password refreshed from ${SSM_PARAM}"
+    echo "Wrote password file from ${SSM_PARAM}"
+fi
+
+# Also reset the admin user's DB password if (a) Grafana is running and
+# (b) we haven't already applied this exact password. The .last-applied
+# file records the SHA-256 of the last password we successfully applied
+# so we don't re-run grafana-cli on every tick.
+current_hash=$(printf '%s' "${password}" | sha256sum | cut -d' ' -f1)
+last_hash=""
+[[ -f "${LAST_APPLIED}" ]] && last_hash=$(cat "${LAST_APPLIED}")
+
+if [[ "${current_hash}" != "${last_hash}" ]]; then
+    if docker ps --format '{{.Names}}' | grep -qx grafana; then
+        echo "Applying password change via grafana-cli"
+        if printf '%s' "${password}" | \
+            docker exec -i grafana grafana cli admin reset-admin-password --password-from-stdin >/dev/null 2>&1; then
+            printf '%s' "${current_hash}" > "${LAST_APPLIED}"
+            chmod 0600 "${LAST_APPLIED}"
+            echo "Admin password updated in Grafana DB"
+        else
+            # Fall back to deprecated-but-still-working 'grafana-cli'.
+            if printf '%s' "${password}" | \
+                docker exec -i grafana grafana-cli admin reset-admin-password --password-from-stdin >/dev/null 2>&1; then
+                printf '%s' "${current_hash}" > "${LAST_APPLIED}"
+                chmod 0600 "${LAST_APPLIED}"
+                echo "Admin password updated in Grafana DB (grafana-cli fallback)"
+            else
+                echo "WARN: grafana cli reset failed; will retry next tick" >&2
+            fi
+        fi
+    else
+        echo "Grafana container not running; skipping DB update (will retry next tick)"
+    fi
 fi
