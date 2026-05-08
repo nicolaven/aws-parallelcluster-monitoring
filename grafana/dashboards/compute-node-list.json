@@ -29,7 +29,12 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
           "links": [
             {
               "title": "View compute node details",
@@ -42,24 +47,223 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Transmit Rate (Bps)"
+              "options": "CPU %"
             },
             "properties": [
               {
                 "id": "unit",
-                "value": "Bps"
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 85
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Receive Rate (Bps)"
+              "options": "Memory %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 85
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Disk %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 85
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Load / Core"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 1.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 2.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Network (B/s)"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "Bps"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 0
               }
             ]
           }
@@ -67,12 +271,11 @@
       },
       "gridPos": {
         "h": 24,
-        "w": 9,
+        "w": 24,
         "x": 0,
         "y": 0
       },
       "id": 2,
-      "pageSize": null,
       "showHeader": true,
       "sort": {
         "col": 2,
@@ -81,29 +284,74 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_name=\"Compute\"}[1m])) * on(instance_id) group_left(nodename) node_uname_info{instance_name=\"Compute\"}",
+          "expr": "((1 - avg by(instance_id) (rate(node_cpu_seconds_total{mode=\"idle\",instance_name=\"Compute\"}[1m]))) * 100) * on(instance_id) group_left(nodename, instance_type) node_uname_info{instance_name=\"Compute\"}",
           "format": "table",
           "instant": true,
           "legendFormat": ""
         },
         {
           "refId": "B",
-          "expr": "sum by(instance_id) (rate(node_network_transmit_bytes_total{instance_name=\"Compute\"}[1m])) * on(instance_id) group_left(nodename) node_uname_info{instance_name=\"Compute\"}",
+          "expr": "((1 - (node_memory_MemAvailable_bytes{instance_name=\"Compute\"} / node_memory_MemTotal_bytes{instance_name=\"Compute\"})) * 100) * on(instance_id) group_left(nodename, instance_type) node_uname_info{instance_name=\"Compute\"}",
           "format": "table",
-          "instant": true
+          "instant": true,
+          "legendFormat": ""
         },
         {
           "refId": "C",
-          "expr": "sum by(instance_id) (rate(node_network_receive_bytes_total{instance_name=\"Compute\"}[1m])) * on(instance_id) group_left(nodename) node_uname_info{instance_name=\"Compute\"}",
+          "expr": "((1 - (node_filesystem_avail_bytes{instance_name=\"Compute\",mountpoint=\"/\",fstype=~\"ext4|xfs\"} / node_filesystem_size_bytes{instance_name=\"Compute\",mountpoint=\"/\",fstype=~\"ext4|xfs\"})) * 100) * on(instance_id) group_left(nodename, instance_type) node_uname_info{instance_name=\"Compute\"}",
           "format": "table",
-          "instant": true
+          "instant": true,
+          "legendFormat": ""
+        },
+        {
+          "refId": "D",
+          "expr": "(node_load1{instance_name=\"Compute\"} / count by(instance_id) (node_cpu_seconds_total{instance_name=\"Compute\",mode=\"idle\"})) * on(instance_id) group_left(nodename, instance_type) node_uname_info{instance_name=\"Compute\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": ""
+        },
+        {
+          "refId": "E",
+          "expr": "(sum by(instance_id) (rate(node_network_receive_bytes_total{instance_name=\"Compute\",device!~\"tap.*|veth.*|br.*|docker.*|virbr.*|lo.*\"}[1m]) + rate(node_network_transmit_bytes_total{instance_name=\"Compute\",device!~\"tap.*|veth.*|br.*|docker.*|virbr.*|lo.*\"}[1m]))) * on(instance_id) group_left(nodename, instance_type) node_uname_info{instance_name=\"Compute\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": ""
+        },
+        {
+          "refId": "F",
+          "expr": "((time() - node_boot_time_seconds{instance_name=\"Compute\"})) * on(instance_id) group_left(nodename, instance_type) node_uname_info{instance_name=\"Compute\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": ""
+        },
+        {
+          "refId": "G",
+          "expr": "node_uname_info{instance_name=\"Compute\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": ""
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "All Available Nodes",
+      "title": "Compute Nodes (click row for details)",
       "type": "table",
-      "options": {},
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "CPU %"
+          }
+        ]
+      },
       "transformations": [
         {
           "id": "merge",
@@ -124,25 +372,31 @@
               "instance": true,
               "instance_name": true,
               "instance_state": true,
-              "instance_vpc": true
+              "instance_vpc": true,
+              "instance_az": true,
+              "Value #G": true
             },
             "renameByName": {
               "nodename": "Node Name",
               "instance_id": "Instance ID",
               "instance_type": "Instance Type",
-              "instance_az": "Availability Zone",
-              "Value #A": "CPU Load",
-              "Value #B": "Transmit Rate (Bps)",
-              "Value #C": "Receive Rate (Bps)"
+              "Value #A": "CPU %",
+              "Value #B": "Memory %",
+              "Value #C": "Disk %",
+              "Value #D": "Load / Core",
+              "Value #E": "Network (B/s)",
+              "Value #F": "Uptime"
             },
             "indexByName": {
               "nodename": 0,
               "instance_id": 1,
               "instance_type": 2,
-              "instance_az": 3,
-              "Value #A": 4,
-              "Value #B": 5,
-              "Value #C": 6
+              "Value #A": 3,
+              "Value #B": 4,
+              "Value #C": 5,
+              "Value #D": 6,
+              "Value #E": 7,
+              "Value #F": 8
             }
           }
         }
