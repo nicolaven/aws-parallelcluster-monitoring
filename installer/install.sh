@@ -121,6 +121,20 @@ case "${cfn_node_type}" in
             -config "${nginx_dir}/openssl.cnf" >/dev/null 2>&1
         chown -R "${cfn_cluster_user}:${cfn_cluster_user}" "${nginx_ssl_dir}"
 
+        # Set up credential refresh for Prometheus ec2_sd_configs.
+        # ParallelCluster's Imds.Secured=true blocks IMDS from non-root
+        # processes (including containers). This timer runs as root on the
+        # host, fetches role creds from IMDS, and writes them to a file
+        # that's bind-mounted into the Prometheus container.
+        install -m 0755 "${MONITORING_HOME}/custom-metrics/refresh-ec2-credentials.sh" /usr/local/bin/
+        install -m 0644 "${MONITORING_HOME}/systemd/prometheus-creds-refresh.service" /etc/systemd/system/
+        install -m 0644 "${MONITORING_HOME}/systemd/prometheus-creds-refresh.timer" /etc/systemd/system/
+        systemctl daemon-reload
+        # Run once immediately so creds exist before Prometheus starts.
+        /usr/local/bin/refresh-ec2-credentials.sh
+        systemctl enable --now prometheus-creds-refresh.timer
+        log "EC2 credential refresh timer active"
+
         # Start the monitoring stack.
         cd "${MONITORING_HOME}"
         docker compose --env-file /etc/parallelcluster/cfnconfig \

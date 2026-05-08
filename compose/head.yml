@@ -17,9 +17,14 @@ services:
     network_mode: host
     pid: host
     restart: unless-stopped
+    environment:
+      # Credentials refreshed by host-side systemd timer (refresh-ec2-credentials.sh).
+      # Required because Imds.Secured=true blocks non-root IMDS access inside containers.
+      - 'AWS_SHARED_CREDENTIALS_FILE=/run/prometheus-ec2-creds/credentials'
     volumes:
       - '/home/${cfn_cluster_user}/__MONITORING_DIR__/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
       - 'prometheus-data:/prometheus'
+      - '/run/prometheus-ec2-creds:/run/prometheus-ec2-creds:ro'
     image: prom/prometheus:v3.1.0
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
