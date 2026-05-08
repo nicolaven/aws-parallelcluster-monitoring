@@ -33,6 +33,8 @@ SSM_PARAM="/parallelcluster/${stack_name}/grafana/admin-password"
 
 mkdir -p "${SECRET_DIR}"
 chmod 0750 "${SECRET_DIR}"
+# Grafana runs as UID 472 inside its container
+chown root:472 "${SECRET_DIR}" 2>/dev/null || true
 
 password=$(aws ssm get-parameter \
     --region "${cfn_region}" \
@@ -54,7 +56,8 @@ if [[ "${need_update}" -eq 1 ]]; then
     umask 0077
     printf '%s' "${password}" > "${SECRET_FILE}.tmp"
     mv -f "${SECRET_FILE}.tmp" "${SECRET_FILE}"
-    chmod 0644 "${SECRET_FILE}"
+    chmod 0640 "${SECRET_FILE}"
+    chown root:472 "${SECRET_FILE}" 2>/dev/null || true
     echo "Wrote password file from ${SSM_PARAM}"
 fi
 

@@ -182,7 +182,7 @@ case "${cfn_node_type}" in
             # on disk.
             mkdir -p /run/grafana-secrets
             chmod 0750 /run/grafana-secrets
-            chown root:65534 /run/grafana-secrets
+            chown root:472 /run/grafana-secrets
 
             cog_client=$(echo "${cognito_json}"  | jq -r .client_id)
             cog_secret=$(echo "${cognito_json}"  | jq -r .client_secret)
@@ -210,10 +210,10 @@ COGENV
             umask 0077
             printf '%s' "${cog_secret}" > /run/grafana-secrets/cognito-client-secret
             chmod 0640 /run/grafana-secrets/cognito-client-secret
-            chown root:65534 /run/grafana-secrets/cognito-client-secret
+            chown root:472 /run/grafana-secrets/cognito-client-secret
             umask 0022
             chmod 0640 /run/grafana-secrets/cognito.env
-            chown root:65534 /run/grafana-secrets/cognito.env
+            chown root:472 /run/grafana-secrets/cognito.env
             log "Cognito env file written to /run/grafana-secrets/cognito.env"
             unset cog_secret cog_client
         else
