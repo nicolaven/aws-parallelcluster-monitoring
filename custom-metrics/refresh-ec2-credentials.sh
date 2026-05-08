@@ -17,6 +17,8 @@ set -euo pipefail
 CREDS_DIR="/run/prometheus-ec2-creds"
 CREDS_FILE="${CREDS_DIR}/credentials"
 mkdir -p "${CREDS_DIR}"
+chmod 0750 "${CREDS_DIR}"
+chown root:65534 "${CREDS_DIR}"
 
 # IMDSv2 token
 TOKEN=$(curl -sS --max-time 5 -X PUT "http://169.254.169.254/latest/api/token" \
@@ -35,11 +37,17 @@ AWS_ACCESS_KEY_ID=$(echo "${CREDS_JSON}" | jq -r .AccessKeyId)
 AWS_SECRET_ACCESS_KEY=$(echo "${CREDS_JSON}" | jq -r .SecretAccessKey)
 AWS_SESSION_TOKEN=$(echo "${CREDS_JSON}" | jq -r .Token)
 
-cat > "${CREDS_FILE}" <<CRED
+# Write atomically via tmp+rename so Prometheus never sees a partial file.
+TMP_FILE="${CREDS_FILE}.tmp"
+cat > "${TMP_FILE}" <<CRED
 [default]
 aws_access_key_id = ${AWS_ACCESS_KEY_ID}
 aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
 aws_session_token = ${AWS_SESSION_TOKEN}
 CRED
 
-chmod 644 "${CREDS_FILE}"
+# Restrict to root + the container's UID (nobody/65534 on our images).
+# Directory is also tmpfs-backed so creds never touch persistent disk.
+chmod 0640 "${TMP_FILE}"
+chown root:65534 "${TMP_FILE}"
+mv -f "${TMP_FILE}" "${CREDS_FILE}"
