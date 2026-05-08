@@ -26,7 +26,6 @@
   ],
   "panels": [
     {
-      "columns": [],
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -34,14 +33,38 @@
           "links": [
             {
               "title": "View compute node details",
-              "url": "/d/compute-node-details?var-node=${__data.fields.nodename}",
+              "url": "/d/qI8VfvXZz/?var-node=${__data.fields[\"Node Name\"]}",
               "targetBlank": false
             }
           ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Transmit Rate (Bps)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "Bps"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Receive Rate (Bps)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "Bps"
+              }
+            ]
+          }
+        ]
       },
-      "fontSize": "100%",
       "gridPos": {
         "h": 24,
         "w": 9,
@@ -55,146 +78,75 @@
         "col": 2,
         "desc": true
       },
-      "styles": [
-        {
-          "alias": "Time",
-          "align": "auto",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "Time",
-          "type": "hidden"
-        },
-        {
-          "alias": "Availability Zone",
-          "align": "left",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "decimals": 2,
-          "pattern": "instance_az",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        },
-        {
-          "alias": "Instance Id",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "link": true,
-          "linkTargetBlank": true,
-          "linkTooltip": "Go To Node Details",
-          "linkUrl": "/grafana/d/qI8VfvXZz/node-details-copy?var-instance_id=${__cell}",
-          "mappingType": 1,
-          "pattern": "instance_id",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        },
-        {
-          "alias": "Instance Type",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "instance_type",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        },
-        {
-          "alias": "CPU load",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Value #A",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        },
-        {
-          "alias": "Transmit Rate",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Value #B",
-          "thresholds": [],
-          "type": "number",
-          "unit": "Bps"
-        },
-        {
-          "alias": "Receive Rate",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Value #C",
-          "thresholds": [],
-          "type": "number",
-          "unit": "Bps"
-        }
-      ],
       "targets": [
         {
-          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[1m])) by (instance_id, instance_type, instance_az)",
+          "refId": "A",
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_name=\"Compute\"}[1m])) * on(instance_id) group_left(nodename) node_uname_info{instance_name=\"Compute\"}",
           "format": "table",
           "instant": true,
-          "legendFormat": "",
-          "refId": "A"
+          "legendFormat": ""
         },
         {
-          "expr": "sum(rate(node_network_transmit_bytes_total[1m])) by (instance_id, instance_type, instance_az)",
+          "refId": "B",
+          "expr": "sum by(instance_id) (rate(node_network_transmit_bytes_total{instance_name=\"Compute\"}[1m])) * on(instance_id) group_left(nodename) node_uname_info{instance_name=\"Compute\"}",
           "format": "table",
-          "instant": true,
-          "refId": "B"
+          "instant": true
         },
         {
-          "expr": "sum(rate(node_network_receive_bytes_total[1m])) by (instance_id, instance_type, instance_az)",
+          "refId": "C",
+          "expr": "sum by(instance_id) (rate(node_network_receive_bytes_total{instance_name=\"Compute\"}[1m])) * on(instance_id) group_left(nodename) node_uname_info{instance_name=\"Compute\"}",
           "format": "table",
-          "instant": true,
-          "refId": "C"
+          "instant": true
         }
       ],
       "timeFrom": null,
       "timeShift": null,
       "title": "All Available Nodes",
-      "transform": "table",
       "type": "table",
-      "options": {}
+      "options": {},
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "job": true,
+              "__name__": true,
+              "domainname": true,
+              "machine": true,
+              "release": true,
+              "sysname": true,
+              "version": true,
+              "instance": true,
+              "instance_name": true,
+              "instance_state": true,
+              "instance_vpc": true
+            },
+            "renameByName": {
+              "nodename": "Node Name",
+              "instance_id": "Instance ID",
+              "instance_type": "Instance Type",
+              "instance_az": "Availability Zone",
+              "Value #A": "CPU Load",
+              "Value #B": "Transmit Rate (Bps)",
+              "Value #C": "Receive Rate (Bps)"
+            },
+            "indexByName": {
+              "nodename": 0,
+              "instance_id": 1,
+              "instance_type": 2,
+              "instance_az": 3,
+              "Value #A": 4,
+              "Value #B": 5,
+              "Value #C": 6
+            }
+          }
+        }
+      ]
     }
   ],
   "schemaVersion": 39,
