@@ -107,16 +107,29 @@ case "${cfn_node_type}" in
         sed -i "s/__AWS_REGION__/${cfn_region}/g"        "${MONITORING_HOME}/prometheus/prometheus.yml"
         sed -i "s|__MONITORING_DIR__|${MONITORING_DIR_NAME}|g" "${MONITORING_HOME}/compose/head.yml"
 
-        # Self-signed TLS cert for nginx. (Phase 2 will add an ACM option.)
+        # Self-signed TLS cert for nginx.
+        # Includes multiple SANs so the cert is valid for:
+        #   - localhost (SSM port-forward)
+        #   - private IP (direct VPC access)
+        #   - private hostname (Slurm node name)
+        # Validity: 10 years. Users who want a trusted cert should put an
+        # ALB with ACM in front — see docs/public-access.md.
         nginx_dir="${MONITORING_HOME}/nginx"
         nginx_ssl_dir="${nginx_dir}/ssl"
         mkdir -p "${nginx_ssl_dir}"
-        # Self-signed cert uses a generic SAN. Users accessing via
-        # SSM port-forward hit https://localhost:*. Users accessing via
-        # public IP will see a cert warning either way (self-signed).
-        # Phase 2 adds an optional ACM + ALB path for trusted certs.
-        echo -e "\nDNS.1=localhost" >> "${nginx_dir}/openssl.cnf"
-        log "TLS cert SAN: localhost (self-signed)"
+
+        private_ip=$(hostname -I 2>/dev/null | awk '{print $1}') || private_ip=""
+        private_hostname=$(hostname -f 2>/dev/null) || private_hostname=""
+
+        {
+            echo ""
+            echo "DNS.1=localhost"
+            [[ -n "${private_hostname}" ]] && echo "DNS.2=${private_hostname}"
+            echo "IP.1=127.0.0.1"
+            [[ -n "${private_ip}" ]] && echo "IP.2=${private_ip}"
+        } >> "${nginx_dir}/openssl.cnf"
+
+        log "TLS cert SANs: localhost, ${private_hostname:-n/a}, 127.0.0.1, ${private_ip:-n/a}"
         openssl req -new -x509 -nodes -newkey rsa:4096 -days 3650 \
             -keyout "${nginx_ssl_dir}/nginx.key" \
             -out "${nginx_ssl_dir}/nginx.crt" \
