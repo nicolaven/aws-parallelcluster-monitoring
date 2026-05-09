@@ -230,7 +230,19 @@ COGENV
             -f "${MONITORING_HOME}/compose/head.yml" \
             -p monitoring-head up -d
 
-        # Install the slurm exporter (prebuilt binary, no go build).
+        # Slurm job-to-node textfile collector (Phase 3c).
+        # Runs every 30s, writes /var/lib/prometheus/node-exporter/slurm_jobs.prom
+        # which node_exporter scrapes via --collector.textfile.
+        mkdir -p /var/lib/prometheus/node-exporter
+        install -m 0755 "${MONITORING_HOME}/custom-metrics/slurm-job-nodes.sh" /usr/local/bin/
+        install -m 0644 "${MONITORING_HOME}/systemd/slurm-job-nodes.service" /etc/systemd/system/
+        install -m 0644 "${MONITORING_HOME}/systemd/slurm-job-nodes.timer" /etc/systemd/system/
+        systemctl daemon-reload
+        /usr/local/bin/slurm-job-nodes.sh || true  # first run (may fail if slurmctld not ready)
+        systemctl enable --now slurm-job-nodes.timer
+        log "Slurm job-node textfile collector active"
+
+                # Install the slurm exporter (prebuilt binary, no go build).
         install_slurm_exporter
         ;;
 

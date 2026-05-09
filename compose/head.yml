@@ -64,10 +64,13 @@ services:
     restart: unless-stopped
     volumes:
       - '/:/host:ro,rslave'
+      - '/var/lib/prometheus/node-exporter:/textfile:ro'
     image: quay.io/prometheus/node-exporter:v1.9.0
     command:
       - '--path.rootfs=/host'
       - '--collector.infiniband'
+      - '--collector.textfile'
+      - '--collector.textfile.directory=/textfile'
 
   nginx:
     container_name: nginx
