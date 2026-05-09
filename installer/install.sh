@@ -118,7 +118,7 @@ case "${cfn_node_type}" in
             log "Reusing existing Grafana password in ${GRAFANA_SSM_PARAM}"
         else
             log "Generating new Grafana admin password, storing in ${GRAFANA_SSM_PARAM}"
-            GRAFANA_PASSWORD=$(tr -dc '''A-Za-z0-9!@#$%^&*''' < /dev/urandom | head -c 32)
+            GRAFANA_PASSWORD=$(openssl rand -hex 16)
             aws ssm put-parameter --region "${cfn_region}" \
                 --name "${GRAFANA_SSM_PARAM}" \
                 --type SecureString \
