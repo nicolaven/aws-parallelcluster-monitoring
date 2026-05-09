@@ -53,26 +53,6 @@ case "${cfn_node_type}" in
         log "Configuring HeadNode"
 
         # Extract context from chef dna.json and CloudFormation.
-        cfn_fsx_fs_id=$(jq -r '.cfn_fsx_fs_id // ""' /etc/chef/dna.json 2>/dev/null || echo "")
-        # Instance ID: read from cloud-init's on-disk copy. No IMDS needed,
-        # works regardless of ParallelCluster's Imds.Secured setting.
-        master_instance_id=$(cat /var/lib/cloud/data/instance-id 2>/dev/null || true)
-        [[ -n "${master_instance_id}" ]] \
-            || die "Could not read instance-id from /var/lib/cloud/data/instance-id"
-        s3_bucket=$(echo "${cfn_postinstall:-}" | sed 's|s3://||;s|/.*||')
-        cluster_s3_bucket=$(jq -r '.cluster_s3_bucket // ""' /etc/chef/dna.json 2>/dev/null || echo "")
-        cluster_config_s3_key=$(jq -r '.cluster_config_s3_key // ""' /etc/chef/dna.json 2>/dev/null || echo "")
-        cluster_config_version=$(jq -r '.cluster_config_version // ""' /etc/chef/dna.json 2>/dev/null || echo "")
-        log_group_names="\\/aws\\/parallelcluster\\/$(echo "${stack_name}" | cut -d'-' -f2-)"
-
-        if [[ -n "${cluster_s3_bucket}" && -n "${cluster_config_s3_key}" ]]; then
-            aws s3api get-object \
-                --bucket "${cluster_s3_bucket}" \
-                --key "${cluster_config_s3_key}" \
-                --region "${cfn_region}" \
-                --version-id "${cluster_config_version}" \
-                "${MONITORING_HOME}/parallelcluster-setup/cluster-config.json" >/dev/null
-        fi
 
         chown "${cfn_cluster_user}:${cfn_cluster_user}" -R "/home/${cfn_cluster_user}"
         chmod +x "${MONITORING_HOME}/custom-metrics/"*
@@ -92,18 +72,10 @@ case "${cfn_node_type}" in
 
         # Token replacement in dashboards/config. (Phase 3 will replace all
         # of this with Grafana template variables.)
-        # Apply every token substitution to every *.json dashboard that
-        # exists. Harmless if a token isn't present in a given file. Only
-        # active dashboards (not *.disabled) are touched.
-        for f in "${MONITORING_HOME}/grafana/dashboards/"*.json; do
-            [[ -f "$f" ]] || continue
-            sed -i "s/_S3_BUCKET_/${s3_bucket}/g"                 "$f"
-            sed -i "s/__INSTANCE_ID__/${master_instance_id}/g"    "$f"
-            sed -i "s/__FSX_ID__/${cfn_fsx_fs_id}/g"              "$f"
-            sed -i "s/__AWS_REGION__/${cfn_region}/g"             "$f"
-            sed -i "s/__LOG_GROUP__NAMES__/${log_group_names}/g"  "$f"
-        done
-        sed -i "s/__Application__/${stack_name}/g"       "${MONITORING_HOME}/prometheus/prometheus.yml"
+        # Dashboards now use Grafana template variables (Phase 3a) — no
+        # sed token replacement needed. Variables auto-resolve from
+        # Prometheus labels (head_instance_id) or user input (fsx_id,
+        # s3_bucket). Only prometheus.yml still needs region substitution.
         sed -i "s/__AWS_REGION__/${cfn_region}/g"        "${MONITORING_HOME}/prometheus/prometheus.yml"
         sed -i "s|__MONITORING_DIR__|${MONITORING_DIR_NAME}|g" "${MONITORING_HOME}/compose/head.yml"
 

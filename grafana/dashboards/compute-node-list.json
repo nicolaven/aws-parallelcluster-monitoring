@@ -415,7 +415,7 @@
             "condition": "",
             "key": "instance_id",
             "operator": "!=",
-            "value": "__INSTANCE_ID__"
+            "value": ""
           }
         ],
         "hide": 2,

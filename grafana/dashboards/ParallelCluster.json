@@ -199,7 +199,7 @@
       ],
       "targets": [
         {
-          "expr": "node_filesystem_size_bytes{instance_id=\"__INSTANCE_ID__\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"}-0",
+          "expr": "node_filesystem_size_bytes{instance_id=\"$head_instance_id\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"}-0",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -209,7 +209,7 @@
           "refId": "C"
         },
         {
-          "expr": "node_filesystem_avail_bytes {instance_id=\"__INSTANCE_ID__\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"}-0",
+          "expr": "node_filesystem_avail_bytes {instance_id=\"$head_instance_id\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"}-0",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -219,7 +219,7 @@
           "refId": "A"
         },
         {
-          "expr": "1-(node_filesystem_free_bytes{instance_id=\"__INSTANCE_ID__\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"} / node_filesystem_size_bytes{instance_id=\"__INSTANCE_ID__\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"})",
+          "expr": "1-(node_filesystem_free_bytes{instance_id=\"$head_instance_id\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"} / node_filesystem_size_bytes{instance_id=\"$head_instance_id\",fstype=~\"ext4|xfs|lustre|nfs|nfs4\"})",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -304,7 +304,7 @@
         {
           "alias": "",
           "dimensions": {
-            "FileSystemId": "__FSX_ID__"
+            "FileSystemId": "$fsx_id"
           },
           "expression": "",
           "id": "fsxRead",
@@ -313,7 +313,7 @@
           "namespace": "AWS/FSx",
           "period": "",
           "refId": "A",
-          "region": "__AWS_REGION__",
+          "region": "$aws_region",
           "statistics": [
             "Sum"
           ]
@@ -321,7 +321,7 @@
         {
           "alias": "",
           "dimensions": {
-            "FileSystemId": "__FSX_ID__"
+            "FileSystemId": "$fsx_id"
           },
           "expression": "",
           "hide": false,
@@ -331,7 +331,7 @@
           "namespace": "AWS/FSx",
           "period": "",
           "refId": "B",
-          "region": "__AWS_REGION__",
+          "region": "$aws_region",
           "statistics": [
             "Sum"
           ]
@@ -464,7 +464,7 @@
         {
           "alias": "",
           "dimensions": {
-            "FileSystemId": "__FSX_ID__"
+            "FileSystemId": "$fsx_id"
           },
           "expression": "",
           "id": "fsxIOPsRead",
@@ -473,7 +473,7 @@
           "namespace": "AWS/FSx",
           "period": "",
           "refId": "A",
-          "region": "__AWS_REGION__",
+          "region": "$aws_region",
           "statistics": [
             "Sum"
           ]
@@ -481,7 +481,7 @@
         {
           "alias": "",
           "dimensions": {
-            "FileSystemId": "__FSX_ID__"
+            "FileSystemId": "$fsx_id"
           },
           "expression": "",
           "hide": false,
@@ -491,7 +491,7 @@
           "namespace": "AWS/FSx",
           "period": "",
           "refId": "B",
-          "region": "__AWS_REGION__",
+          "region": "$aws_region",
           "statistics": [
             "Sum"
           ]
@@ -1076,7 +1076,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "count(node_cpu_seconds_total{mode=\"idle\",instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "count(node_cpu_seconds_total{mode=\"idle\",instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1128,7 +1128,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "count(node_cpu_seconds_total{mode=\"idle\",instance_id!=\"__INSTANCE_ID__\"})/count(count(node_cpu_seconds_total{instance_id!=\"__INSTANCE_ID__\"}) by (instance_id))",
+          "expr": "count(node_cpu_seconds_total{mode=\"idle\",instance_id!=\"$head_instance_id\"})/count(count(node_cpu_seconds_total{instance_id!=\"$head_instance_id\"}) by (instance_id))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1180,7 +1180,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1232,7 +1232,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_id!=\"__INSTANCE_ID__\"}[1m]))/count(count(node_cpu_seconds_total{instance_id!=\"__INSTANCE_ID__\"}) by (instance_id))",
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_id!=\"$head_instance_id\"}[1m]))/count(count(node_cpu_seconds_total{instance_id!=\"$head_instance_id\"}) by (instance_id))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1285,7 +1285,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1338,7 +1338,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"})/count(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"})/count(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1391,7 +1391,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"}) - sum(node_memory_MemAvailable_bytes{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"}) - sum(node_memory_MemAvailable_bytes{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1444,7 +1444,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "(sum(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"}) - sum(node_memory_MemAvailable_bytes{instance_id!=\"__INSTANCE_ID__\"}))/count(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "(sum(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"}) - sum(node_memory_MemAvailable_bytes{instance_id!=\"$head_instance_id\"}))/count(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1497,7 +1497,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(rate(node_disk_written_bytes_total{instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(rate(node_disk_written_bytes_total{instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1550,7 +1550,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(rate(node_disk_written_bytes_total{instance_id!=\"__INSTANCE_ID__\"}[1m])) / count(node_disk_written_bytes_total{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(rate(node_disk_written_bytes_total{instance_id!=\"$head_instance_id\"}[1m])) / count(node_disk_written_bytes_total{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1603,7 +1603,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(rate(node_disk_read_bytes_total{instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(rate(node_disk_read_bytes_total{instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1656,7 +1656,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(rate(node_disk_read_bytes_total{instance_id!=\"__INSTANCE_ID__\"}[1m])) / count(node_disk_read_bytes_total{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(rate(node_disk_read_bytes_total{instance_id!=\"$head_instance_id\"}[1m])) / count(node_disk_read_bytes_total{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1716,13 +1716,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "count(node_cpu_seconds_total{mode=\"idle\",instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "count(node_cpu_seconds_total{mode=\"idle\",instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "Total cores",
           "refId": "B"
         },
         {
-          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\",instance_id!=\"$head_instance_id\"}[1m]))",
           "legendFormat": "Load in cores",
           "refId": "A"
         }
@@ -1817,13 +1817,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "Total Memory",
           "refId": "B"
         },
         {
-          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"__INSTANCE_ID__\"}) - sum(node_memory_MemAvailable_bytes{instance_id!=\"__INSTANCE_ID__\"})",
+          "expr": "sum(node_memory_MemTotal_bytes{instance_id!=\"$head_instance_id\"}) - sum(node_memory_MemAvailable_bytes{instance_id!=\"$head_instance_id\"})",
           "interval": "",
           "legendFormat": "Used Memory",
           "refId": "A"
@@ -1919,7 +1919,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(node_disk_read_bytes_total{instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(rate(node_disk_read_bytes_total{instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "Read throughput",
           "refId": "A"
@@ -2015,7 +2015,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(node_disk_written_bytes_total{instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(rate(node_disk_written_bytes_total{instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "Write throughput",
           "refId": "A"
@@ -2120,7 +2120,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(irate(node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(irate(node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2173,7 +2173,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(irate(node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"__INSTANCE_ID__\"}[1m]))/count(count(node_network_transmit_bytes_total{instance_id!=\"__INSTANCE_ID__\"}) by(instance_id))",
+          "expr": "sum(irate(node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"$head_instance_id\"}[1m]))/count(count(node_network_transmit_bytes_total{instance_id!=\"$head_instance_id\"}) by(instance_id))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2226,7 +2226,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(irate(node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(irate(node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2279,7 +2279,7 @@
       "pluginVersion": "7.0.6",
       "targets": [
         {
-          "expr": "sum(irate(node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"__INSTANCE_ID__\"}[1m]))/count(count(node_network_receive_bytes_total{instance_id!=\"__INSTANCE_ID__\"}) by(instance_id))",
+          "expr": "sum(irate(node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"$head_instance_id\"}[1m]))/count(count(node_network_receive_bytes_total{instance_id!=\"$head_instance_id\"}) by(instance_id))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2347,7 +2347,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(irate(node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(irate(node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "Transmit",
           "refId": "A"
@@ -2449,7 +2449,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(irate(node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"__INSTANCE_ID__\"}[1m]))",
+          "expr": "sum(irate(node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*',instance_id!=\"$head_instance_id\"}[1m]))",
           "interval": "",
           "legendFormat": "Receive",
           "refId": "A"
@@ -2567,7 +2567,7 @@
         {
           "alias": "",
           "dimensions": {
-            "BucketName": "_S3_BUCKET_"
+            "BucketName": "$s3_bucket"
           },
           "expression": "",
           "id": "",
@@ -2576,7 +2576,7 @@
           "namespace": "AWS/S3",
           "period": "",
           "refId": "A",
-          "region": "__AWS_REGION__",
+          "region": "$aws_region",
           "statistics": [
             "Sum"
           ]
@@ -2680,7 +2680,7 @@
         {
           "alias": "",
           "dimensions": {
-            "BucketName": "_S3_BUCKET_"
+            "BucketName": "$s3_bucket"
           },
           "expression": "",
           "id": "",
@@ -2689,7 +2689,7 @@
           "namespace": "AWS/S3",
           "period": "",
           "refId": "A",
-          "region": "__AWS_REGION__",
+          "region": "$aws_region",
           "statistics": [
             "Sum"
           ]
@@ -2742,7 +2742,37 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "head_instance_id",
+        "type": "query",
+        "datasource": "prometheus",
+        "query": "label_values(node_uname_info{instance_name=\"HeadNode\"}, instance_id)",
+        "refresh": 1,
+        "hide": 2,
+        "sort": 0
+      },
+      {
+        "name": "aws_region",
+        "type": "custom",
+        "query": "us-east-2",
+        "hide": 2
+      },
+      {
+        "name": "fsx_id",
+        "type": "textbox",
+        "label": "FSx Filesystem ID",
+        "query": "",
+        "hide": 0
+      },
+      {
+        "name": "s3_bucket",
+        "type": "textbox",
+        "label": "S3 Bucket",
+        "query": "",
+        "hide": 0
+      }
+    ]
   },
   "time": {
     "from": "now-1h",

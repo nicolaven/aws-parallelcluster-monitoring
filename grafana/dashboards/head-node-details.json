@@ -2263,11 +2263,20 @@
   "templating": {
     "list": [
       {
+        "name": "head_instance_id",
+        "type": "query",
+        "datasource": "prometheus",
+        "query": "label_values(node_uname_info{instance_name=\"HeadNode\"}, instance_id)",
+        "refresh": 1,
+        "hide": 2,
+        "sort": 0
+      },
+      {
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "__INSTANCE_ID__",
-          "value": "__INSTANCE_ID__"
+          "text": "",
+          "value": ""
         },
         "datasource": "prometheus",
         "definition": "label_values(node_uname_info{job=~\"ec2_instances\"}, instance_id)",
