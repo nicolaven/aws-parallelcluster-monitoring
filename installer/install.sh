@@ -59,15 +59,14 @@ case "${cfn_node_type}" in
 
         cp -rp "${MONITORING_HOME}/custom-metrics/"* /usr/local/bin/
 
-        # Cron jobs for the cost scraper. MAILTO="" prevents cron email spam
-        # (closes issue #15).
-        crontab -u "${cfn_cluster_user}" -l 2>/dev/null > /tmp/crontab.tmp || true
+        # Cost estimator cron (every minute). Single unified script replaces
+        # the old 1m + 1h split. Runs as root (needs EC2 describe + pricing API).
+        crontab -l 2>/dev/null > /tmp/crontab.tmp || true
         {
             echo 'MAILTO=""'
-            grep -v -E 'MAILTO|cost-metrics\.sh' /tmp/crontab.tmp || true
-            echo '*/1 * * * * /usr/local/bin/1m-cost-metrics.sh >/dev/null 2>&1'
-            echo '0 * * * * /usr/local/bin/1h-cost-metrics.sh >/dev/null 2>&1'
-        } | crontab -u "${cfn_cluster_user}" -
+            grep -v -E 'MAILTO|cost-metrics' /tmp/crontab.tmp || true
+            echo '* * * * * /usr/local/bin/cost-metrics.sh >/dev/null 2>&1'
+        } | crontab -
         rm -f /tmp/crontab.tmp
 
         # Token replacement in dashboards/config. (Phase 3 will replace all
