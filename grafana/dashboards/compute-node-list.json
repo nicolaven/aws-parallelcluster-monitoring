@@ -421,24 +421,7 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": [
-      {
-        "datasource": null,
-        "filters": [
-          {
-            "condition": "",
-            "key": "instance_id",
-            "operator": "!=",
-            "value": ""
-          }
-        ],
-        "hide": 2,
-        "label": "",
-        "name": "Filters",
-        "skipUrlSync": false,
-        "type": "adhoc"
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-15m",
