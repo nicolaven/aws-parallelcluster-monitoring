@@ -47,7 +47,7 @@ verify_docker
 # ---------------------------------------------------------------------------
 case "${PLATFORM_NODE_TYPE}" in
 
-    HeadNode|MasterServer)
+    head|login)
         log "Configuring HeadNode"
 
         # Extract context from chef dna.json and CloudFormation.
