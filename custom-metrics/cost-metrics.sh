@@ -40,7 +40,9 @@ fetch_price() {
 
 build_price_cache() {
     local head_type
-    head_type=$(cat /var/lib/cloud/data/instance-type 2>/dev/null || echo "unknown")
+    # /var/lib/cloud/data/instance-type doesn't exist on AL2023.
+    # This script runs as root, so IMDS is accessible (Imds.Secured allows root).
+    head_type=$(cat /var/lib/cloud/data/instance-type 2>/dev/null ||         curl -sf -H "X-aws-ec2-metadata-token: $(curl -sf -X PUT http://169.254.169.254/latest/api/token -H X-aws-ec2-metadata-token-ttl-seconds:60)"         http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null || echo "unknown")
 
     # Get compute instance types currently running
     local compute_types
