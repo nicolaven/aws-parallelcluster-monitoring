@@ -26,6 +26,20 @@
   ],
   "panels": [
     {
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": -1
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "> **Note:** This dashboard requires GPU instances running the `dcgm-exporter` container (port 9400). If no GPU nodes appear in the dropdown above, your cluster has no GPU compute nodes running, or the DCGM exporter hasn't started yet."
+      }
+    },
+    {
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
@@ -2027,6 +2041,66 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "type": "timeseries",
+      "title": "NVLink Errors (CRC + Recovery)",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 100
+      },
+      "targets": [
+        {
+          "expr": "rate(DCGM_FI_DEV_NVLINK_CRC_FLIT_ERROR_COUNT_TOTAL{instance_id=\"$instance_id\"}[$__interval])",
+          "legendFormat": "{{gpu}} CRC Flit",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(DCGM_FI_DEV_NVLINK_CRC_DATA_ERROR_COUNT_TOTAL{instance_id=\"$instance_id\"}[$__interval])",
+          "legendFormat": "{{gpu}} CRC Data",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(DCGM_FI_DEV_NVLINK_RECOVERY_ERROR_COUNT_TOTAL{instance_id=\"$instance_id\"}[$__interval])",
+          "legendFormat": "{{gpu}} Recovery",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "errors/s"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "GPU Memory Utilization %",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 100
+      },
+      "targets": [
+        {
+          "expr": "DCGM_FI_DEV_FB_USED{instance_id=\"$instance_id\"} / (DCGM_FI_DEV_FB_USED{instance_id=\"$instance_id\"} + DCGM_FI_DEV_FB_FREE{instance_id=\"$instance_id\"}) * 100",
+          "legendFormat": "{{gpu}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      }
     }
   ],
   "refresh": "10s",
@@ -2038,31 +2112,25 @@
   "templating": {
     "list": [
       {
-        "allValue": null,
-        "current": {
-          "selected": true,
-          "text": "i-0edc71e97259faa4c",
-          "value": "i-0edc71e97259faa4c"
-        },
-        "datasource": "prometheus",
-        "definition": "label_values(node_uname_info{job=~\"ec2_instances\",instance_type=~\"[pg][2-4].*\"}, instance_id)",
-        "error": null,
-        "hide": 0,
-        "includeAll": false,
-        "label": "Instance ID",
-        "multi": false,
-        "name": "instance_id",
-        "options": [],
-        "query": "label_values(node_uname_info{job=~\"ec2_instances\",instance_type=~\"[pg][2-4].*\"}, instance_id)",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
+        "name": "gpu_node",
         "type": "query",
-        "useTags": false
+        "datasource": "prometheus",
+        "query": "label_values(DCGM_FI_DEV_GPU_UTIL, instance_id)",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false,
+        "hide": 0,
+        "sort": 1,
+        "label": "GPU Node"
+      },
+      {
+        "name": "instance_id",
+        "type": "query",
+        "datasource": "prometheus",
+        "query": "label_values(DCGM_FI_DEV_GPU_UTIL{instance_id=\"$gpu_node\"}, instance_id)",
+        "refresh": 2,
+        "hide": 2,
+        "sort": 0
       }
     ]
   },
