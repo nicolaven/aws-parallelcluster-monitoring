@@ -23,7 +23,7 @@ services:
     network_mode: host
     pid: host
     restart: unless-stopped
-    image: nvcr.io/nvidia/k8s/dcgm-exporter:4.0.0-4.0.0-ubuntu22.04
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:4.5.2-4.8.1-ubuntu22.04
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
