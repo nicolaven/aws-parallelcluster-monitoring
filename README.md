@@ -22,7 +22,7 @@ Slurm metrics as containers — no manual configuration required.
 
 | Dashboard | Platform | Description |
 |-----------|----------|-------------|
-| **ParallelCluster Summary** | Both | Cluster overview: Slurm states, CPU/memory aggregates |
+| **Cluster Summary** | Both | Cluster overview: Slurm states, CPU/memory aggregates |
 | **Compute Node List** | Both | Fleet table with CPU/Mem/Disk gauges, job info, click-through |
 | **Compute Node Details** | Both | Per-node deep-dive (CPU, memory, disk, network, EFA) |
 | **GPU Node List** | Both | GPU fleet table: model, utilization, temp, power, memory — click-through |
