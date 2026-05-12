@@ -24,26 +24,25 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "DCGM_FI_DEV_GPU_UTIL",
+          "expr": "avg by(instance_id, instance_type, modelName) (DCGM_FI_DEV_GPU_UTIL)",
           "format": "table",
-          "instant": true,
-          "legendFormat": ""
+          "instant": true
         },
         {
           "refId": "B",
-          "expr": "DCGM_FI_DEV_GPU_TEMP",
+          "expr": "avg by(instance_id) (DCGM_FI_DEV_GPU_TEMP)",
           "format": "table",
           "instant": true
         },
         {
           "refId": "C",
-          "expr": "DCGM_FI_DEV_POWER_USAGE",
+          "expr": "avg by(instance_id) (DCGM_FI_DEV_POWER_USAGE)",
           "format": "table",
           "instant": true
         },
         {
           "refId": "D",
-          "expr": "DCGM_FI_DEV_FB_USED / (DCGM_FI_DEV_FB_USED + DCGM_FI_DEV_FB_FREE) * 100",
+          "expr": "avg by(instance_id) (DCGM_FI_DEV_FB_USED / (DCGM_FI_DEV_FB_USED + DCGM_FI_DEV_FB_FREE) * 100)",
           "format": "table",
           "instant": true
         }
@@ -216,31 +215,25 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true,
-              "__name__": true,
-              "job": true,
-              "instance": true,
-              "UUID": true,
-              "pci_bus_id": true,
-              "device": true,
-              "DCGM_FI_DRIVER_VERSION": true,
-              "Hostname": true,
-              "instance_az": true,
-              "instance_state": true,
-              "instance_vpc": true,
-              "instance_name": true,
-              "node_group_id": true,
-              "gpu": true
+              "Time": true
             },
             "renameByName": {
               "modelName": "GPU Model",
               "instance_id": "Instance ID",
-              "instance_type": "Instance Type"
+              "instance_type": "Instance Type",
+              "Value #A": "GPU Util %",
+              "Value #B": "Temp \u00b0C",
+              "Value #C": "Power W",
+              "Value #D": "Mem %"
             },
             "indexByName": {
               "modelName": 0,
               "instance_type": 1,
-              "instance_id": 2
+              "instance_id": 2,
+              "Value #A": 3,
+              "Value #B": 4,
+              "Value #C": 5,
+              "Value #D": 6
             }
           }
         }
