@@ -48,7 +48,15 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "links": [
+            {
+              "title": "View node details",
+              "url": "/d/qI8VfvXZz/?var-node=${__data.fields[\"Node Name\"]}",
+              "targetBlank": false
+            }
+          ]
+        },
         "overrides": [
           {
             "matcher": {
@@ -174,14 +182,6 @@
           }
         ]
       }
-    }
-  ],
-  "links": [
-    {
-      "title": "Node Details",
-      "type": "link",
-      "url": "/grafana/d/compute-node-details/compute-node-details?var-node_instance_id=${__data.fields[\"Instance ID\"]}",
-      "targetBlank": false
     }
   ]
 }
