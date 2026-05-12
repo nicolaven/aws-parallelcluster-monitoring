@@ -31,6 +31,56 @@ Slurm metrics as containers — no manual configuration required.
 | **Login Node List** | PCS | Login nodes table with click-through to node details |
 | **Cluster Costs** | Both | Cost/hour breakdown (headnode/login, compute, EBS) + accumulated total |
 
+
+## Screenshots
+
+### Landing page
+Entry point served at `https://<host>/` with links to Grafana, Prometheus, and
+the most-used dashboards.
+
+![Landing page](docs/screenshots/landing-page.png)
+
+### Dashboard list
+All dashboards available in Grafana. On PCS the **Login Node List** replaces
+**HeadNode Details**; GPU dashboards (List + Details) are available on both
+platforms.
+
+![Dashboard list](docs/screenshots/dashboard-list.png)
+
+### Cluster Summary
+High-level cluster view: Slurm node states, CPU allocation, running/pending/
+completed/failed jobs, total GPUs, and average GPU utilization. Works on both
+ParallelCluster and PCS (PCS metrics are translated via Prometheus recording
+rules).
+
+![Cluster Summary](docs/screenshots/cluster-summary.png)
+
+### Compute Node List
+Sortable table of every compute node with live gauges for CPU, memory, disk,
+load, and uptime. Click any row to drill down into per-node details.
+
+![Compute Node List](docs/screenshots/compute-node-list.png)
+
+### Compute Node Details
+Per-node deep dive: CPU breakdown (user/system/iowait), memory, load average,
+disk I/O, network throughput, file descriptors, context switches, and more.
+EFA panels auto-populate on EFA-enabled hardware.
+
+![Compute Node Details](docs/screenshots/compute-node-details.png)
+
+### GPU Node List
+Fleet view of GPU nodes with model, utilization, temperature, power, and
+memory gauges. Click any row to open the detailed per-GPU dashboard.
+
+![GPU Node List](docs/screenshots/gpu-node-list.png)
+
+### Cluster Costs
+Real-time cost/hour and accumulated cost since cluster start, broken down by
+component (head/login node, compute, EBS). List prices via AWS Pricing API,
+cached for 24h.
+
+![Cluster Costs](docs/screenshots/cluster-costs.png)
+
 ## Quickstart — ParallelCluster
 
 Add to your `pcluster.yaml` under **both** `HeadNode` and each `SlurmQueue`:
