@@ -272,7 +272,7 @@
       "type": "stat",
       "title": "Jobs Running",
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 4,
         "x": 0,
         "y": 12
@@ -293,7 +293,17 @@
                 "value": null
               }
             ]
-          }
+          },
+          "custom": {}
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         }
       }
     },
@@ -301,7 +311,7 @@
       "type": "stat",
       "title": "Jobs Pending",
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 4,
         "x": 4,
         "y": 12
@@ -330,7 +340,17 @@
                 "value": 20
               }
             ]
-          }
+          },
+          "custom": {}
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         }
       }
     },
@@ -338,7 +358,7 @@
       "type": "stat",
       "title": "Jobs Completed",
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 4,
         "x": 8,
         "y": 12
@@ -359,7 +379,17 @@
                 "value": null
               }
             ]
-          }
+          },
+          "custom": {}
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         }
       }
     },
@@ -367,7 +397,7 @@
       "type": "stat",
       "title": "Jobs Failed",
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 4,
         "x": 12,
         "y": 12
@@ -392,7 +422,17 @@
                 "value": 1
               }
             ]
-          }
+          },
+          "custom": {}
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         }
       }
     },
@@ -400,7 +440,7 @@
       "type": "stat",
       "title": "Total GPUs",
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 4,
         "x": 16,
         "y": 12
@@ -421,7 +461,17 @@
                 "value": null
               }
             ]
-          }
+          },
+          "custom": {}
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         }
       }
     },
@@ -429,7 +479,7 @@
       "type": "stat",
       "title": "Avg GPU Util",
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 4,
         "x": 20,
         "y": 12
@@ -459,7 +509,17 @@
                 "value": 90
               }
             ]
-          }
+          },
+          "custom": {}
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         }
       }
     },
@@ -470,7 +530,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 18
       },
       "targets": [
         {
