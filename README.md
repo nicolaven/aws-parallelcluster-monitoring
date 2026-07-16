@@ -36,6 +36,13 @@ Tags:
 
 See the complete example config: [pcluster.yaml](parallelcluster-setup/pcluster.yaml).
 
+## Reducing compute node boot time (custom AMI)
+By default the monitoring stack is installed by the post-install action on every node boot. On compute nodes this runs on every scale-up event and adds noticeable boot latency (installing Docker, downloading `docker-compose`, and pulling container images over the network — plus `nvidia-docker2` and the `dcgm-exporter` image on GPU nodes).
+
+To speed up compute node boot, you can pre-install these packages and images into a custom ParallelCluster AMI. Note that ParallelCluster custom AMIs are tied to a specific ParallelCluster version, so we don't ship a prebuilt AMI — instead we document the procedure to build one for your version.
+
+See [Reducing compute node boot time with a custom AMI](docs/custom-ami.md) for the step-by-step guide and expected boot-time savings.
+
 ## AWS ParallelCluster
 **AWS ParallelCluster** is an AWS supported Open Source cluster management tool that makes it easy for you to deploy and
 manage High Performance Computing (HPC) clusters in the AWS cloud.
